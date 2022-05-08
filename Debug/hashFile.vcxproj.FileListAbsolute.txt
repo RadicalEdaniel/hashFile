@@ -1,1 +1,2 @@
 C:\Users\Jane\source\repos\hashFile\Debug\hashFile.exe
+C:\Users\Jane\source\repos\hashFile\cpp\Debug\hashFile.exe

@@ -20,11 +20,9 @@
 #include <condition_variable>
 #include <mutex>
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//global vars of a mutex and cv. They're needed solely to stop main thread if we don't have enough memory
-std::mutex mainMutex;
-std::condition_variable mainConditionVatiable;
-
+//for sleeping in a thread
+#include <chrono>
+#include <thread>
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //a class for thread safe queue
 template <class T> //using a template to not create 2 types of containers in here - uint and vector <char>. 
@@ -107,8 +105,6 @@ void writeToFile(concurrentQueue<unsigned int> &outputQueue, std::ofstream &outF
 
 int main()
 {
-    //mutex that we lock if we don't have enough memory later
-    std::unique_lock<std::mutex> mainLock(mainMutex);  
     //strings for cin
     std::string inFileName="", outFileName="", chunkSizeString="";
     //input and output data streams
@@ -175,11 +171,17 @@ int main()
             /*this right here is to be sure that we even have enough memory to move forward.
                 if not - we wait until other threads are finished with their data and we have enough. 
             */
-            mainConditionVatiable.wait(mainLock, [&] 
-                {
-                    buffer.resize(chunkSize, 0); 
-                    return buffer.size() == chunkSize;
-                });
+            /*At first i've used a CV/mutex wait here as well but then i've slept on it and realised 
+            that... wasn't the best idea. It's not perfect - waiting in the main thread never is - 
+            but i think this should do the job*/
+            for(;;)
+            {
+                buffer.resize(chunkSize, 0); 
+                if (buffer.size() == chunkSize)
+                    break;
+                else
+                    std::this_thread::sleep_for(std::chrono::milliseconds(20));//to not freeze the programm
+            }
             
         }
         //waiting for all threads to finish

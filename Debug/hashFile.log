@@ -3,4 +3,4 @@
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
   Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-  hashFile.vcxproj -> C:\Users\Jane\source\repos\hashFile\Debug\hashFile.exe
+  hashFile.vcxproj -> C:\Users\Jane\source\repos\hashFile\cpp\Debug\hashFile.exe
